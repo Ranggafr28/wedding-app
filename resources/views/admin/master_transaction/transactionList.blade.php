@@ -1,0 +1,326 @@
+@extends('layout.index')
+@section('content')
+    <!-- Navbar -->
+    <nav class="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all ease-in shadow-none duration-250 rounded-2xl lg:flex-nowrap lg:justify-start"
+        navbar-main navbar-scroll="false">
+        <div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
+            <nav>
+                <!-- breadcrumb -->
+                <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
+                    <li class="text-sm leading-normal">
+                        <a class="text-white opacity-50" href="javascript:;">Dashboard</a>
+                    </li>
+                    <li class="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['/']"
+                        aria-current="page">{{ $title }}</li>
+                </ol>
+                <h6 class="mb-0 font-bold text-white capitalize">{{ $title }}</h6>
+            </nav>
+            <div class="flex items-center justify-end mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
+                <div class="flex justify-end pl-0 mb-0 list-none md-max:w-full gap-5 items-center">
+                    <div class="flex gap-2 border-r border-white">
+                        @if (auth()->user()->role == 'customer')
+                            {{-- button keranjang --}}
+                            @livewire('cart-counter')
+                            <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
+                            </button>
+                        @endif
+                        {{-- button notifikasi --}}
+                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-bell-ring">
+                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
+                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
+                            </svg>
+                            <div
+                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
+                                20</div>
+                        </button>
+                    </div>
+                    <li class="flex items-center">
+                        <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
+                            class="block p-0 text-sm text-white transition-all ease-nav-brand">
+                            <i class="fa fa-user sm:mr-1"></i> <span
+                                class="hidden sm:inline">{{ auth()->user()->fullname }}</span></button>
+                        <div data-popover id="popover-bottom" role="tooltip"
+                            class="absolute z-50 invisible inline-block w-48 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                            {{-- content dropdown --}}
+                            <div class="w-full text-gray-900 bg-white border-0 border-gray-200 rounded-lg">
+                                <div
+                                    class="px-4 py-3  flex flex-col space-y-2 text-sm text-gray-900 border-b border-gray-200">
+                                    <div class="font-semibold">{{ auth()->user()->fullname }}</div>
+                                    <p>{{ $user->email != '' ? $user->email : '-' }}</p>
+                                </div>
+                                <a href="{{ route('profile.index') }}"
+                                    class="relative inline-flex items-center w-full px-4 py-2 text-sm font-medium border-b border-gray-200 rounded-t-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 me-2.5" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-circle-user">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <circle cx="12" cy="10" r="3" />
+                                        <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+                                    </svg>
+                                    Profil
+                                </a>
+                                <form action="{{ route('authLogout') }}" method="post">
+                                    @csrf
+                                    @method('POST')
+                                    <button type="submit"
+                                        class="relative inline-flex items-center w-full px-4 py-2 text-sm font-medium rounded-b-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-0">
+                                        <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                            class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                                        </svg>
+
+                                        Keluar
+                                    </button>
+                                </form>
+                            </div>
+                            <div data-popper-arrow></div>
+                        </div>
+                    </li>
+                    <li class="flex items-center pl-4 xl:hidden">
+                        <a href="javascript:;" class="block p-0 text-sm text-white transition-all ease-nav-brand"
+                            sidenav-trigger>
+                            <div class="w-4.5 overflow-hidden">
+                                <i class="ease mb-0.75 relative block h-0.5 rounded-sm bg-white transition-all"></i>
+                                <i class="ease mb-0.75 relative block h-0.5 rounded-sm bg-white transition-all"></i>
+                                <i class="ease relative block h-0.5 rounded-sm bg-white transition-all"></i>
+                            </div>
+                        </a>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        <!-- cards row 2 -->
+        <div class="flex flex-wrap mt-6 -mx-3">
+            <div class="w-full max-w-full px-3 mt-0 lg:w-full lg:flex-none">
+                <div
+                    class="border-black/12.5 shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-xl border-0 border-solid bg-white bg-clip-border p-5">
+                    {{-- filter view --}}
+                    <div class="flex justify-between w-full items-center ">
+                        <form class="w-1/3" action="{{ route($route) }}" method="GET">
+                            <div class="relative">
+                                <input type="text" name="search" id="default-search" value=""
+                                    class="block w-full py-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950"
+                                    placeholder="Cari nama user, username ..." />
+                                <button type="submit"
+                                    class="absolute end-2.5 bottom-2 font-medium rounded-lg text-sm px-4 py-2"><svg
+                                        class="w-4 h-4 text-gray-700" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 20 20">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                    </svg></button>
+                            </div>
+                        </form>
+                    </div>
+                    @if (session()->has('success'))
+                        <script>
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                text: "{{ session('success') }}",
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        </script>
+                    @endif
+                    @if (session()->has('error'))
+                        <script>
+                            Swal.fire({
+                                position: "center",
+                                icon: "error",
+                                text: "{{ session('error') }}",
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        </script>
+                    @endif
+                    {{-- table --}}
+                    <div class="relative overflow-x-hidden shadow-lg sm:rounded-lg mt-5">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-800 uppercase bg-gray-300">
+                                <tr>
+                                    <th scope="col" class="px-2 py-3 text-center">
+                                        No
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        No trans
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        customer
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-center">
+                                        total biaya
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-center">
+                                        status
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-center">
+                                        Act
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($data as $datas => $item)
+                                    <tr class="bg-gray-100 border-b hover:bg-gray-200 text-gray-900">
+                                        <th scope="row" class="px-2 py-4 font-medium text-center">
+                                            {{ $datas + $data->firstItem() }}
+                                        </th>
+                                        <td class="px-6 py-4 font-semibold">
+                                            {{ $item->no_trans }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            {{ $item->fullname }}
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            Rp {{ str_replace(',', '.', number_format($item->total_price)) }}
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            @switch($item->status)
+                                                @case('Pesanan Selesai')
+                                                    <span
+                                                        class="bg-green-100 text-green-800 border border-green-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $item->status }}</span>
+                                                @break
+
+                                                @case('Menunggu Pembayaran')
+                                                    <span
+                                                        class="bg-yellow-100 text-yellow-800 border border-yellow-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $item->status }}</span>
+                                                @break
+
+                                                @case('Pesanan Dibatalkan')
+                                                    <span
+                                                        class="bg-red-100 text-red-800 border border-red-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $item->status }}</span>
+                                                @break
+
+                                                @case('Pesanan Diproses')
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 border border-blue-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $item->status }}</span>
+                                                @break
+                                            @endswitch
+                                        </td>
+                                        <td class="px-6 py-4 text-center w-32">
+                                            <div class="grid grid-cols-2 gap-5">
+                                                <button data-modal-target="default-modal"
+                                                    data-modal-toggle="default-modal"
+                                                    class="bg-yellow-600 text-white p-2 rounded-lg w-fit"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                        fill="currentColor" class="w-5 h-5">
+                                                        <path
+                                                            d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
+                                                        <path
+                                                            d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
+                                                    </svg>
+                                                </button>
+                                                <a href="{{ route('transactionDetail', ['no_trans' => $item->no_trans]) }}"
+                                                    class="bg-cyan-600 text-white p-2 rounded-lg w-fit"><svg
+                                                        xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        class="lucide lucide-list-collapse">
+                                                        <path d="m3 10 2.5-2.5L3 5" />
+                                                        <path d="m3 19 2.5-2.5L3 14" />
+                                                        <path d="M10 6h11" />
+                                                        <path d="M10 12h11" />
+                                                        <path d="M10 18h11" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @if ($data->isEmpty())
+                                    <tr class="odd:bg-white even:bg-gray-50 border-b">
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 text-center"
+                                            colspan="4">
+                                            Data tidak ada
+                                        </th>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                        <div id="default-modal" tabindex="-1" aria-hidden="true"
+                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-96 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative p-4 w-full max-w-2xl max-h-full">
+                            <!-- Modal content -->
+                            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                                <!-- Modal header -->
+                                <div
+                                    class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                        Terms of Service
+                                    </h3>
+                                    <button type="button"
+                                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                        data-modal-hide="default-modal">
+                                        <svg class="w-3 h-3" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="2"
+                                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                        </svg>
+                                        <span class="sr-only">Close modal</span>
+                                    </button>
+                                </div>
+                                <!-- Modal body -->
+                                <div class="p-4 md:p-5 space-y-4">
+                                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                        With less than a month to go before the European Union enacts new
+                                        consumer privacy laws for its citizens, companies around the world
+                                        are updating their terms of service agreements to comply.
+                                    </p>
+                                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                        The European Union’s General Data Protection Regulation (G.D.P.R.)
+                                        goes into effect on May 25 and is meant to ensure a common set of
+                                        data rights in the European Union. It requires organizations to
+                                        notify users as soon as possible of high-risk data breaches that
+                                        could personally affect them.
+                                    </p>
+                                </div>
+                                <!-- Modal footer -->
+                                <div
+                                    class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                    <button data-modal-hide="default-modal" type="button"
+                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I
+                                        accept</button>
+                                    <button data-modal-hide="default-modal" type="button"
+                                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Decline</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class=" my-5 px-5">
+                        {{ $data->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function deleteData(id) {
+            Swal.fire({
+                title: 'Apa Kamu Yakin?',
+                text: "Kamu Tidak Dapat Mengembalikan Data ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus ini!'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById(`delete-form-${id}`).submit();
+                }
+            });
+        }
+    </script>
+@endsection
