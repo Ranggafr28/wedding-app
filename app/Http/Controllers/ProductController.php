@@ -16,6 +16,8 @@ class ProductController extends Controller
   public function index(Request $request)
   {
     $search = $request->input('search');
+    $status = $request->input('status');
+    $categoryFilter = $request->input('category');
     $data = ProductModels::selectRaw('master_product.*, master_vendor.fullname AS vendor_name, master_product.id AS product_id')
       ->leftJoin('master_vendor', 'master_product.vendor_id', '=', 'master_vendor.vendor_id');
 
@@ -26,12 +28,21 @@ class ProductController extends Controller
       });
     }
 
+    if ($status) {
+      $data->where('master_product.status', $status);
+    }
+
+    if ($categoryFilter) {
+      $data->where('master_product.category', $categoryFilter);
+    }
+
     // Check if the user has the vendor role and filter data accordingly
     if (auth()->user()->role == 'vendor') {
       $data->where('master_product.vendor_id', auth()->user()->user_id);
     }
 
     $data = $data->orderBy('master_product.created_at', 'desc')->paginate(10);
+
     $user = CustomerModels::where('user_id', auth()->user()->user_id)->first();
     if (!$user) {
       $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
@@ -43,6 +54,8 @@ class ProductController extends Controller
       'route' => 'product',
       'data' => $data,
       'params' => $search,
+      'status' => $status,
+      'categoryFilter' => $categoryFilter,
       'category' => $category,
       'user' => $user
     ]);
@@ -57,7 +70,8 @@ class ProductController extends Controller
     if (!$user) {
       $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
     }
-    $vendor = VendorModels::all();
+    // jika role user vendor maka ambil data vendor user ini saja, jika bukan ambil semua data vendor
+    $vendor = auth()->user()->role == 'vendor' ? VendorModels::where('vendor_id', auth()->user()->user_id)->get() : VendorModels::all();
     $category = CategoryModels::all();
     return view('master_product.create', [
       'title' => 'Tambah Data',
@@ -121,7 +135,8 @@ class ProductController extends Controller
       $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
     }
     $data = ProductModels::find($id);
-    $vendor = VendorModels::all();
+    // jika role user vendor maka ambil data vendor user ini saja, jika bukan ambil semua data vendor
+    $vendor = auth()->user()->role == 'vendor' ? VendorModels::where('vendor_id', auth()->user()->user_id)->get() : VendorModels::all();
     $category = CategoryModels::all();
     return view('master_product.update', [
       'title' => 'Ubah Data',

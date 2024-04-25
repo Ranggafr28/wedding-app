@@ -19,20 +19,23 @@ class userController extends Controller
   public function index(Request $request)
   {
     $search = $request->input('search');
+    $filterRole = $request->input('role');
+    $data = User::query();
+    if ($filterRole) {
+      $data = $data->where('role', $filterRole);
+    };
     if ($search) {
-      $data = User::where('fullname', 'like', '%' . $search . '%')
-        ->orWhere('username', 'like', '%' . $search . '%')
-        ->orderBy('created_at', 'desc')
-        ->paginate(10);
-    } else {
-      $data = User::query()->orderBy('created_at', 'desc')->paginate(10);
+      $data = $data->where('fullname', 'like', '%' . $search . '%')
+        ->orWhere('username', 'like', '%' . $search . '%');
     }
+    $data = $data->orderBy('created_at', 'desc')
+      ->paginate(10);
 
     $user = CustomerModels::where('user_id', auth()->user()->user_id)->first();
     if (!$user) {
       $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
     }
-
+    $role = RoleModels::all();
     return view('master_user.index', [
       'title' => 'Master User',
       'modul' => 'Master User',
@@ -40,6 +43,8 @@ class userController extends Controller
       'data' => $data,
       'params' => $search,
       'user' => $user,
+      'role' => $role,
+      'filterRole' => $filterRole,
     ]);
   }
 
@@ -78,6 +83,7 @@ class userController extends Controller
     ]);
     $uuid = Str::uuid();
     $now = now();
+    // ekripsi inputan password
     $hashedPassword = Hash::make($request->password);
     if ($request->role == 'customer') {
       $result = CustomerModels::create([
@@ -87,7 +93,7 @@ class userController extends Controller
         'phone' => $request->phone,
         'created_at' => $now,
       ]);
-    } elseif ($request->role == 'vendor') {
+    } elseif ($request->role == 'vendor' || $request->role == 'administrator') {
       $result = VendorModels::create([
         'vendor_id' => $uuid,
         'fullname' => $request->fullname,
@@ -149,12 +155,10 @@ class userController extends Controller
     $validatedData = $request->validate([
       'username' => 'required',
     ]);
+    // jika password tidak diubah maka password yang diinputkan akan diubah menjadi password yang lama
+    $hashedPassword = $request->password != NULL ? Hash::make($request->password) : Hash::make($data->password);
     $now = now();
-    if ($request->password == null) {
-      $validatedData['password'] = $data->password;
-    } else {
-      $validatedData['password'] = $request->password;
-    }
+    $validatedData['password'] = $hashedPassword;
     $validatedData['updated_at'] = $now;
     User::where('id', $id)
       ->update($validatedData);

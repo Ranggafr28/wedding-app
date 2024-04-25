@@ -15,19 +15,26 @@ class OrderController extends Controller
   public function orderList(Request $request)
   {
     $search = $request->input('search');
+    $filterTgl = $request->input('filterTgl');
     $filterStatus = $request->input('filterStatus');
+    // memecah filter tanggal range 
+    $date = explode(" - ", $filterTgl);
+
     $user = CustomerModels::where('user_id', auth()->user()->user_id)->first();
     if (!$user) {
       $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
     }
+
     $transactions = TransactionModels::where('customer_id', auth()->user()->user_id)
       ->where('no_trans', 'like', '%' . $search . '%');
 
     if ($filterStatus) {
       $transactions->where('status', $filterStatus);
     }
-
-    $transactions = $transactions->orderBy('created_at', 'desc')->get();
+    if ($filterTgl) {
+      $transactions = $transactions->whereBetween('created_at', [$date[0], $date[1]]);
+    }
+    $transactions = $transactions->orderBy('created_at', 'desc')->paginate(10);
 
 
     // Membuat array untuk menampung semua nomor transaksi yang ditemukan
@@ -47,6 +54,7 @@ class OrderController extends Controller
       'products' => $products,
       'search' => $search,
       'filterStatus' => $filterStatus,
+      'filterTgl' => $filterTgl,
     ]);
   }
   public function orderDetail($no_trans)
@@ -63,10 +71,19 @@ class OrderController extends Controller
     $products = CheckoutProducts::where('no_trans', $no_trans)
       ->join('master_product', 'checkout_products.code_product', '=', 'master_product.code_product')
       ->get();
+    // Mengumpulkan id vendr dari setiap produk
+    $vendorIds = $products->pluck('vendor_id')->unique()->toArray();
+    // Mengambil vendor berdasarkan vendor_id yang terkumpul
+    $vendor = VendorModels::whereIn('master_vendor.vendor_id', $vendorIds)
+      ->leftJoin('transaction_approval', 'master_vendor.vendor_id', '=', 'transaction_approval.vendor_id')
+      ->get();
 
-    $currentDate = Carbon::now();
-    $dataDate = Carbon::createFromFormat('Y-m-d', $transactions->event_date);
-    $diffInDays = $currentDate->diffInDays($dataDate, false);
+    // mengkalkulasi selisih hari dengan tanggal acara
+    if ($transactions->event_date) {
+      $currentDate = Carbon::now();
+      $dataDate = Carbon::createFromFormat('Y-m-d', $transactions->event_date);
+    }
+    $diffInDays = $transactions->event_date ? $currentDate->diffInDays($dataDate, false) : '';
     return view('order.orderDetail', [
       'title' => 'Detail Pesanan',
       'modul' => 'order',
@@ -76,6 +93,7 @@ class OrderController extends Controller
       'bills' => $bills,
       'products' => $products,
       'diffInDays' => $diffInDays,
+      'vendor' => $vendor,
     ]);
   }
   public function orderFeedback(Request $request)

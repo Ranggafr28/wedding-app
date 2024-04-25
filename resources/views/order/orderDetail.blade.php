@@ -56,20 +56,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -137,15 +123,34 @@
             <div class="w-full max-w-full px-3 mt-0 lg:w-full lg:flex-none">
                 <div
                     class="border-black/12.5 shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-xl border-0 border-solid bg-white bg-clip-border p-5">
-                    {{-- call to action --}}
-                    <div class="flex justify-end w-full items-center ">
-                        <a href="{{ route('orderList') }}"
-                            class="bg-blue-950 py-2 px-3 text-sm rounded-lg text-white font-medium">Kembali</a>
-                    </div>
+                    @if (session()->has('success'))
+                        <script>
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                text: "{{ session('success') }}",
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        </script>
+                    @endif
+                    @if (session()->has('error'))
+                        <script>
+                            Swal.fire({
+                                position: "center",
+                                icon: "error",
+                                text: "{{ session('error') }}",
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        </script>
+                    @endif
                     {{-- info pesanan --}}
                     <div class="w-full bg-white  border-b border-gray-300 p-4 my-2">
-                        <div class="flex gap-3">
+                        <div class="flex justify-between gap-3">
                             <p class="text-black font-medium text-lg mb-2">Info Pesanan</p>
+                            <a href="{{ route('orderList') }}"
+                                class="bg-blue-950 py-2 px-3 text-sm rounded-lg text-white font-medium">Kembali</a>
                         </div>
                         <div class="flex flex-col space-y-3">
                             <div class="flex w-full items-center">
@@ -153,9 +158,27 @@
                                     <p class="text-gray-600 text-sm">Status Transaksi:</p>
                                 </div>
                                 <div class="w-auto">
-                                    <p
-                                        class="font-medium text-sm px-2 py-1 rounded-lg border {{ $transactions->status == 'Pesanan Selesai' ? 'text-green-800 bg-green-300  border-green-800' : 'text-yellow-800 bg-yellow-300  border-yellow-800' }}">
-                                        {{ $transactions->status }}</p>
+                                    @switch($transactions->status)
+                                        @case('Pesanan Selesai')
+                                            <span
+                                                class="bg-green-100 text-green-800 border border-green-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $transactions->status }}</span>
+                                        @break
+
+                                        @case('Menunggu Pembayaran')
+                                            <span
+                                                class="bg-yellow-100 text-yellow-800 border border-yellow-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $transactions->status }}</span>
+                                        @break
+
+                                        @case('Pesanan Dibatalkan')
+                                            <span
+                                                class="bg-red-100 text-red-800 border border-red-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $transactions->status }}</span>
+                                        @break
+
+                                        @case('Pesanan Diproses')
+                                            <span
+                                                class="bg-blue-100 text-blue-800 border border-blue-600 capitalize text-xs font-medium me-2 px-2.5 py-0.5 rounded">{{ $transactions->status }}</span>
+                                        @break
+                                    @endswitch
                                 </div>
                             </div>
                             <div class="flex w-full items-center">
@@ -168,11 +191,19 @@
                             </div>
                             <div class="flex w-full items-center">
                                 <div class="w-1/6">
-                                    <p class="text-gray-600 text-sm">Tanggal Pesan:</p>
+                                    <p class="text-gray-600 text-sm">Tanggal Acara:</p>
                                 </div>
                                 <div class="w-3/4">
-                                    <p class="text-black font-medium text-sm">{{ formatDate($transactions->created_at) }}
-                                    </p>
+                                    @if ($transactions->event_date)
+                                        <p class="text-black font-medium text-sm">
+                                            {{ formatDate($transactions->event_date) }}
+                                        </p>
+                                    @else
+                                        <button type="button" data-modal-target="date-modal"
+                                            data-modal-toggle="date-modal"
+                                            class="py-2 px-3 rounded-lg bg-blue-900 text-white capitalize text-xs font-semibold">Atur
+                                            tanggal</button>
+                                    @endif
                                 </div>
                             </div>
                             <div class="flex w-full items-center">
@@ -180,17 +211,25 @@
                                     <p class="text-gray-600 text-sm">Alamat:</p>
                                 </div>
                                 <div class="w-3/4">
-                                    <p class="text-black font-medium text-sm">{{ $user->fullname }}</p>
-                                    <p class="text-gray-600 text-sm">62{{ $user->phone }}</p>
-                                    <p class="text-gray-600 text-sm">
-                                        {{ $transactions->event_address ? $transactions->event_address : $user->address }}
-                                    </p>
+                                    @if ($transactions->event_address)
+                                        <p class="text-black font-medium text-sm">{{ $user->fullname }}</p>
+                                        <p class="text-gray-600 text-sm">62{{ $user->phone }}</p>
+                                        <p class="text-gray-600 text-sm">
+                                            {{ $transactions->event_address }}
+                                        </p>
+                                    @else
+                                        <button type="button" data-modal-target="default-modal"
+                                            data-modal-toggle="default-modal"
+                                            class="py-2 px-3 rounded-lg bg-blue-900 text-white capitalize text-xs font-semibold">Atur
+                                            alamat acara</button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
                     {{-- info tagihan --}}
                     <div class="w-full bg-white p-4 my-2 border-b border-gray-300">
+                        <p class="text-lg font-semibold mb-2 text-slate-800">Informasi Tagihan</p>
                         <div class="relative">
                             <table class="w-full text-sm text-left text-gray-500 border border-gray-300">
                                 <thead class="text-xs text-white uppercase bg-blue-950">
@@ -240,26 +279,22 @@
                                                 {{ $item->payment_date != '' ? formatDate($item->payment_date) : '-' }}
                                             </td>
                                             <td class="py-4 text-center">
-                                                @if ($item->payment_name == 'pembayaran 1')
-                                                    @if ($item->status == 'Belum Bayar' && $transactions->status != 'Pesanan Dibatalkan')
+                                                @if ($item->status == 'Belum Bayar' && $transactions->status != 'Pesanan Dibatalkan')
+                                                    @if ($item->payment_name == 'pembayaran 2')
+                                                        @if ($diffInDays <= 7 && $diffInDays >= 0)
+                                                            <form
+                                                                action="{{ route('orderCreatePayment', ['no_trans' => $item->no_trans, 'orderId' => $item->order_id]) }}"
+                                                                method="GET">
+                                                                <button type="submit" id="pay-button1"
+                                                                    class="bg-yellow-500 p-2 rounded-lg text-white text-sm font-semibold">Bayar
+                                                                    Sekarang</button>
+                                                            </form>
+                                                        @endif
+                                                    @else
                                                         <form
                                                             action="{{ route('orderCreatePayment', ['no_trans' => $item->no_trans, 'orderId' => $item->order_id]) }}"
                                                             method="GET">
-                                                            <button type="submit"
-                                                                class="bg-yellow-500 p-2 rounded-lg text-white text-sm font-semibold">Bayar
-                                                                Sekarang</button>
-                                                        </form>
-                                                    @endif
-                                                @elseif($item->payment_name == 'pembayaran 2')
-                                                    @if (
-                                                        $diffInDays <= 7 &&
-                                                            $diffInDays >= 0 &&
-                                                            $item->status == 'Belum Bayar' &&
-                                                            $transactions->status != 'Pesanan Dibatalkan')
-                                                        <form
-                                                            action="{{ route('orderCreatePayment', ['no_trans' => $item->no_trans, 'orderId' => $item->order_id]) }}"
-                                                            method="GET">
-                                                            <button type="submit"
+                                                            <button type="submit" id="pay-button2"
                                                                 class="bg-yellow-500 p-2 rounded-lg text-white text-sm font-semibold">Bayar
                                                                 Sekarang</button>
                                                         </form>
@@ -276,6 +311,48 @@
                                         Rp{{ str(str_replace(',', '.', number_format($transactions->total_price))) }}</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    {{-- vendor list --}}
+                    <div class="w-full bg-white p-4 my-2 border-b border-gray-300">
+                        <p class="text-lg font-semibold mb-2 text-slate-800">List Vendor</p>
+                        <div class="relative">
+                            <table class="w-full text-sm text-left text-gray-500 border border-gray-300">
+                                <thead class="text-xs text-white uppercase bg-blue-950">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-center">
+                                            Vendor
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-center">
+                                            Respon
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($vendor as $item)
+                                        <tr class="bg-white border-b">
+                                            <th scope="row" class="py-4 font-medium text-gray-900 text-center">
+                                                {{ $item->fullname }}
+                                            </th>
+                                            <td class="py-4 text-center">
+                                                @switch($item->approve)
+                                                    @case('Bersedia')
+                                                        <span
+                                                            class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded  border border-green-400">{{ $item->approve }}</span>
+                                                    @break
+
+                                                    @case('Tidak Bersedia')
+                                                        <span
+                                                            class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded  border border-red-400">{{ $item->approve }}</span>
+                                                    @break
+
+                                                    @default
+                                                @endswitch
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     {{-- order list --}}
@@ -305,7 +382,8 @@
                                                 <p class="text-black font-semibold">{{ $data->product }}</p>
                                                 <p class="text-gray-600 text-xs mb-3">{{ $data->qty }} barang x
                                                     Rp{{ str_replace(',', '.', number_format($data->price)) }}</p>
-                                                <p class="text-gray-500 text-xs">Catatan:{{ $data->remark }}</p>
+                                                <p class="text-gray-500 text-xs">Catatan:
+                                                    {{ '"' . $data->product_note . '"' }}</p>
                                             </div>
                                         </div>
                                     @endforeach
@@ -314,11 +392,94 @@
                         </div>
                     </div>
                 </div>
+                {{-- modal alamat --}}
+                <div id="default-modal" tabindex="-1" aria-hidden="true"
+                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="relative p-4 w-full max-w-lg max-h-full">
+                        <form action="{{ route('updateInfo') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="update" value="address">
+                            <input type="hidden" name="no_trans" value="{{ $transactions->no_trans }}">
+                            <!-- Modal content -->
+                            <div class="relative bg-white rounded-lg shadow">
+                                <div class="p-4 md:p-5">
+                                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900">Alamat
+                                        Lengkap</label>
+                                    <textarea id="event_address" rows="4" name="event_address" required
+                                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-0 focus:border-blue-500"
+                                        placeholder="Tuliskan alamat lengkap disini..."></textarea>
+                                    <p id="addressErrorMessage" class="text-xs text-red-600"></p>
+                                </div>
+                                <!-- Modal footer -->
+                                <div
+                                    class="flex items-center justify-end p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                    <button type="submit" id="btn_event_address"
+                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                        simpan</button>
+                                    <button data-modal-hide="default-modal" type="button"
+                                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Batalkan</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {{-- modal tanggal --}}
+                <div id="date-modal" tabindex="-1" aria-hidden="true"
+                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="relative p-4 w-full max-w-md max-h-full">
+                        <form action="{{ route('updateInfo') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="update" value="eventDate">
+                            <input type="hidden" name="no_trans" value="{{ $transactions->no_trans }}">
+                            <!-- Modal content -->
+                            <div class="relative bg-white rounded-lg shadow">
+                                <div class="p-4 md:p-5">
+                                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900">Atur
+                                        tanggal
+                                        acara</label>
+                                    <input type="text" id="eventDate" name="event_date"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-blue-950 block w-full p-2.5"
+                                        placeholder="Masukan tanggal..." required />
+                                    <p id="dateErrorMessage" class="text-xs text-red-600"></p>
+                                </div>
+                                <!-- Modal footer -->
+                                <div
+                                    class="flex items-center justify-end p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                    <button type="submit" id="btn_eventDate"
+                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                        simpan</button>
+                                    <button data-modal-hide="date-modal" type="button"
+                                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">Batalkan</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <!-- end cards -->
     <script>
+        $(document).ready(() => {
+            // config flatpickr untuk menentukan tanggal acara
+            $('#eventDate').flatpickr({
+                altInput: true,
+                altFormat: "j F, Y",
+                dateFormat: "Y-m-d",
+                locale: 'id'
+            });
+            // validasi jika alamat acara dan tanggal acara masih kosong tombol bayar akan disabled
+            const eventDate = "{{ $transactions->event_date }}"
+            const eventAddress = "{{ $transactions->event_address }}"
+            if (eventDate.trim() === '' || eventAddress.trim() === '') {
+                // Jika eventDate kosong, nonaktifkan tombol
+                $('#pay-button1').addClass('opacity-50 cursor-not-allowed');
+                $('#pay-button1').prop('disabled', true);
+                $('#pay-button2').addClass('opacity-50 cursor-not-allowed');
+                $('#pay-button2').prop('disabled', true);
+            }
+        });
+
         function deleteData(id) {
             Swal.fire({
                 title: 'Apa Kamu Yakin?',

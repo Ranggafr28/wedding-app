@@ -56,20 +56,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -197,7 +183,7 @@
                                     <p class="text-gray-600 text-sm">Tanggal Acara:</p>
                                 </div>
                                 <div class="w-3/4">
-                                    <p class="text-black font-medium text-sm">{{ formatDate($transactions->event_date) }}
+                                    <p class="text-black font-medium text-sm">{{ $transactions->event_date ? formatDate($transactions->event_date) : '(Belum diatur)' }}
                                     </p>
                                 </div>
                             </div>
@@ -209,7 +195,7 @@
                                     <p class="text-black font-medium text-sm">{{ $customer->fullname }}</p>
                                     <p class="text-gray-600 text-sm">+62{{ $customer->phone }}</p>
                                     <p class="text-gray-600 text-sm">
-                                        {{ $transactions->event_address ? $transactions->event_address : $customer->address }}
+                                        {{ $transactions->event_address ? $transactions->event_address : '(Belum diatur)' }}
                                     </p>
                                 </div>
                             </div>
@@ -238,8 +224,6 @@
                                             <th scope="col" class="px-6 py-3">
                                                 tanggal bayar
                                             </th>
-                                            <th scope="col" class="px-6 py-3">
-                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -266,33 +250,6 @@
                                                 </td>
                                                 <td class="text-gray-800 py-4 text-center">
                                                     {{ $item->payment_date != '' ? formatDate($item->payment_date) : '-' }}
-                                                </td>
-                                                <td class="py-4 text-center">
-                                                    @if ($item->payment_name == 'pembayaran 1')
-                                                        @if ($item->status == 'Belum Bayar' && $transactions->status != 'Pesanan Dibatalkan')
-                                                            <form
-                                                                action="{{ route('orderCreatePayment', ['no_trans' => $item->no_trans, 'orderId' => $item->order_id]) }}"
-                                                                method="GET">
-                                                                <button type="submit"
-                                                                    class="bg-yellow-500 p-2 rounded-lg text-white text-sm font-semibold">Bayar
-                                                                    Sekarang</button>
-                                                            </form>
-                                                        @endif
-                                                    @elseif($item->payment_name == 'pembayaran 2')
-                                                        @if (
-                                                            $diffInDays <= 7 &&
-                                                                $diffInDays >= 0 &&
-                                                                $item->status == 'Belum Bayar' &&
-                                                                $transactions->status != 'Pesanan Dibatalkan')
-                                                            <form
-                                                                action="{{ route('orderCreatePayment', ['no_trans' => $item->no_trans, 'orderId' => $item->order_id]) }}"
-                                                                method="GET">
-                                                                <button type="submit"
-                                                                    class="bg-yellow-500 p-2 rounded-lg text-white text-sm font-semibold">Bayar
-                                                                    Sekarang</button>
-                                                            </form>
-                                                        @endif
-                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach

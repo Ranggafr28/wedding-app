@@ -22,7 +22,7 @@ class ProfileController extends Controller
     if (!$user) {
       $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
     }
-$category = CategoryModels::all();
+    $category = CategoryModels::all();
     return view('profile', [
       'title' => 'Profile',
       'modul' => 'Profile',
@@ -81,7 +81,7 @@ $category = CategoryModels::all();
       $validatedData['password'] = $hashedPassword;
       User::where('user_id', $id)
         ->update($validatedData);
-      return redirect()->route('profile.index')->with('updatePassword', 'data Edited successfully');
+      return redirect()->route('profile.index')->with('success', 'Berhasil mengubah password');
     } elseif ($request->file('avatar')) {
       $validatedData = $request->validate([
         'avatar' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -93,10 +93,10 @@ $category = CategoryModels::all();
 
       if ($profile) {
         $profile->update($validatedData);
-        return redirect()->route('profile.index')->with('updateProfile', 'Data edited successfully');
+        return redirect()->route('profile.index')->with('success', 'Berhasil mengubah foto profil');
       } else {
         // Jika profil tidak ditemukan, beri respons sesuai kebutuhan aplikasi Anda
-        return redirect()->route('profile.index')->with('error', 'Profile not found');
+        return redirect()->route('profile.index')->with('error', 'Maaf!, Gagal mengubah foto profil');
       }
     } else {
       if ($user->role == 'customer') {
@@ -110,13 +110,12 @@ $category = CategoryModels::all();
         $validatedData['updated_at'] = Carbon::now();
         CustomerModels::where('user_id', $id)
           ->update($validatedData);
-        return redirect()->route('profile.index')->with('updateProfile', 'data Edited successfully');
-        return back()->with('error', 'Maaf!, Inputan tidak boleh kosong');
+        return redirect()->route('profile.index')->with('success', 'Berhasil mengubah data profil');
+        return back()->with('error', 'Maaf!, Gagal mengubah data');
       } else if ($user->role == 'vendor') {
         $validatedData = $request->validate([
           'fullname' => 'required',
           'phone' => 'required',
-          'category' => 'required',
         ]);
         $validatedData['email'] = $request->email;
         $validatedData['address'] = $request->address;
@@ -124,8 +123,8 @@ $category = CategoryModels::all();
         $validatedData['updated_at'] = Carbon::now();
         VendorModels::where('vendor_id', $id)
           ->update($validatedData);
-        return redirect()->route('profile.index')->with('updateProfile', 'data Edited successfully');
-        return back()->with('error', 'Maaf!, Inputan tidak boleh kosong');
+        return redirect()->route('profile.index')->with('success', 'Berhasil mengubah data profil');
+        return back()->with('error', 'Maaf!, Gagal mengubah data');
       }
     }
   }

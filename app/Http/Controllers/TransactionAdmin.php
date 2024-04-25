@@ -13,15 +13,23 @@ use Carbon\Carbon;
 
 class TransactionAdmin extends Controller
 {
-    public function transactionList()
+    public function transactionList(Request $request)
     {
-
+        $search = $request->input('search');
+        $status = $request->input('status');
         $user = CustomerModels::where('user_id', auth()->user()->user_id)->first();
         if (!$user) {
             $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
         }
-        $data = TransactionModels::leftJoin('master_customer', 'transaction.customer_id', '=', 'master_customer.user_id')
-            ->orderBy('transaction.no_trans', 'DESC')
+        $data = TransactionModels::leftJoin('master_customer', 'transaction.customer_id', '=', 'master_customer.user_id');
+        if ($search) {
+            $data = $data->where('transaction.no_trans', 'LIKE', '%' . $search . '%')
+                ->orWhere('master_customer.fullname', 'LIKE', '%' . $search . '%');
+        }
+        if ($status) {
+            $data = $data->where('transaction.status', $status);
+        }
+        $data = $data->orderBy('transaction.no_trans', 'DESC')
             ->paginate(10);
         return view('admin.master_transaction.transactionList', [
             'title' => 'List Transaksi',
@@ -29,6 +37,8 @@ class TransactionAdmin extends Controller
             'route' => 'transactionList',
             'user' => $user,
             'data' => $data,
+            'search' => $search,
+            'status' => $status,
         ]);
     }
 
@@ -56,9 +66,11 @@ class TransactionAdmin extends Controller
             ->get();
 
         // mengkalkulasi selisih hari dengan tanggal acara
-        $currentDate = Carbon::now();
-        $dataDate = Carbon::createFromFormat('Y-m-d', $transactions->event_date);
-        $diffInDays = $currentDate->diffInDays($dataDate, false);
+        if ($transactions->event_date) {
+            $currentDate = Carbon::now();
+            $dataDate = Carbon::createFromFormat('Y-m-d', $transactions->event_date);
+        }
+        $diffInDays = $transactions->event_date ? $currentDate->diffInDays($dataDate, false) : '';
 
         return view('admin.master_transaction.transactionDetail', [
             'title' => 'Transaksi Detail',
@@ -75,16 +87,30 @@ class TransactionAdmin extends Controller
         ]);
     }
 
-    public function transactionApproval()
+    public function transactionApproval(Request $request)
     {
+        $search = $request->input('search');
+        $filterTgl = $request->input('filterTgl');
+        // memecah filter tanggal range
+        $date = explode(" - ", $filterTgl);
+
         $user = CustomerModels::where('user_id', auth()->user()->user_id)->first();
         if (!$user) {
             $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
         }
         $data = TransactionModels::leftJoin('master_customer', 'transaction.customer_id', '=', 'master_customer.user_id')
             ->leftJoin('transaction_approval', 'transaction.no_trans', '=', 'transaction_approval.no_trans')
-            ->where('transaction_approval.vendor_id', '=', auth()->user()->user_id)
-            ->orderBy('transaction.no_trans', 'DESC')
+            ->where('transaction_approval.vendor_id', '=', auth()->user()->user_id);
+        if ($search) {
+            $data->where(function ($query) use ($search) {
+                $query->where('transaction_approval.no_trans', 'like', '%' . $search . '%')
+                    ->orWhere('master_customer.fullname', 'like', '%' . $search . '%');
+            });
+        }
+        if ($filterTgl) {
+            $data = $data->whereBetween('transaction.event_date', [$date[0], $date[1]]);
+        }
+        $data = $data->orderBy('transaction.no_trans', 'DESC')
             ->paginate(10);
 
         return view('admin.master_transaction.transactionApproval', [
@@ -93,6 +119,8 @@ class TransactionAdmin extends Controller
             'route' => 'transactionApproval',
             'user' => $user,
             'data' => $data,
+            'search' => $search,
+            'filterTgl' => $filterTgl,
         ]);
     }
     public function storeTransactionAprroval(Request $request, $no_trans)
@@ -115,6 +143,16 @@ class TransactionAdmin extends Controller
         ]);
         if ($storeData) {
             return redirect()->route('transactionApproval')->with('success', 'Berhasil memberikan respon');
+        }
+    }
+    public function statusUpdate(Request $request)
+    {
+        $storeData = TransactionModels::where('no_trans', $request->no_trans)->update([
+            'status' => 'Pesanan Selesai',
+            'updated_at' => Carbon::now(),
+        ]);
+        if ($storeData) {
+            return redirect()->route('transactionList')->with('success', 'Berhasil mengubah status transaksi');
         }
     }
 }

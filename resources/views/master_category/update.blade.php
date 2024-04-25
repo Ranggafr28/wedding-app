@@ -27,20 +27,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -120,13 +106,16 @@
                             <div class="mb-5">
                                 <label for="category" class="block mb-2 text-sm font-medium text-gray-900">Kategori</label>
                                 <input type="text" id="category" name="category" value="{{ $data->category }}"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                    placeholder="Masukan kategori.." required />
+                                    class="@error('category') is-invalid border-red-500 @enderror bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-blue-950 block w-full p-2.5"
+                                    placeholder="Masukan kategori.." />
+                                @error('category')
+                                    <div class="text-xs text-red-600 mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="mb-5">
                                 <label for="remark" class="block mb-2 text-sm font-medium text-gray-900">Catatan</label>
                                 <textarea id="remark" rows="4" name="remark"
-                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring--0 focus:border-blue-950"
                                     placeholder="Tulis catatan disini...">{{ $data->remark }}</textarea>
                             </div>
                         </div>

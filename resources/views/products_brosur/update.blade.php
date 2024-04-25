@@ -18,6 +18,17 @@
                 </ol>
                 <h6 class="mb-0 font-bold text-white capitalize">{{ $title }}</h6>
             </nav>
+            @if (session()->has('error'))
+                <script>
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        text: "{{ session('error') }}",
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                </script>
+            @endif
             <div class="flex items-center justify-end mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
                 <div class="flex justify-end pl-0 mb-0 list-none md-max:w-full gap-5 items-center">
                     <div class="flex gap-2 border-r border-white">
@@ -27,20 +38,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -101,17 +98,6 @@
         </div>
     </nav>
     <!-- end Navbar -->
-    @if (session()->has('error'))
-        <script>
-            Swal.fire({
-                position: "center",
-                icon: "error",
-                text: "{{ session('error') }}",
-                showConfirmButton: false,
-                timer: 2000
-            });
-        </script>
-    @endif
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
         <!-- cards row 2 -->
@@ -124,20 +110,21 @@
                         <a href="{{ route($route . '.index') }}"
                             class="bg-blue-950 py-2 px-3 text-sm rounded-lg text-white font-medium">Kembali</a>
                     </div>
-                    <form action="{{ route($route . '.store') }}" method="post" enctype="multipart/form-data">
-                        @method('POST')
+                    <form method="POST" action="{{ route($route . '.update', ['gallery_list' => $data->id]) }}"
+                        enctype="multipart/form-data">
+                        @method('PUT')
                         @csrf
                         <div class="grid grid-cols-4 gap-5 mt-5">
-                            {{-- gambar produk --}}
+                            {{-- brosur produk --}}
                             <div class="mb-5 col-span-2">
-                                <label for="image" class="block mb-2 text-sm font-medium text-gray-900">Gambar
+                                <label for="image" class="block mb-2 text-sm font-medium text-gray-900">Brosur
                                     Produk</label>
                                 <div class="flex items-center">
                                     <div class="flex items-center justify-center w-full">
                                         <label for="dropzone-file"
-                                            class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                            class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100">
                                             <div class="flex flex-col items-center justify-center">
-                                                <div class="flex flex-col items-center justify-center pt-5 pb-6"
+                                                <div class="hidden flex flex-col items-center justify-center pt-5 pb-6"
                                                     id="dropzone-label">
                                                     <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true"
                                                         xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -153,7 +140,8 @@
                                                             <p class="text-xs text-gray-500">PNG, JPG or PNG
                                                                 (MAX. 2MB)</p>
                                                 </div>
-                                                <img id="dropzone-img" src="" alt="">
+                                                <img id="dropzone-img" alt=""
+                                                    src="data:image/png;base64,{{ $data->images }}" class="h-52">
                                             </div>
                                             <input id="dropzone-file" type="file" class="hidden" name="images" />
                                         </label>
@@ -161,26 +149,55 @@
                                 </div>
                             </div>
                             <div class="col-span-2">
+                                {{-- select list produk --}}
                                 <div class="mb-5">
                                     <label for="product"
                                         class="block mb-2 text-sm font-medium text-gray-900">Produk</label>
                                     <select id="product" name="code_product"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        class="@error('code_product') is-invalid border-red-500 @enderror bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-blue-950 block w-full p-2.5">
                                         <option selected disabled>Pilih Produk</option>
                                         @foreach ($product as $item)
-                                            <option value="{{ $item->code_product }}">{{ $item->product }}</option>
+                                            <option value="{{ $item->code_product }}"
+                                                {{ $data->code_product == $item->code_product ? 'selected' : '' }}>
+                                                {{ $item->product }}</option>
                                         @endforeach
                                     </select>
+                                    @error('code_product')
+                                        <div class="text-xs text-red-600 mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
+                                {{-- select list vendor --}}
+                                <div class="mb-5">
+                                    <label for="vendor"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Vendor</label>
+                                    <select id="vendor" name="vendor_id"
+                                        class="@error('vendor_id') is-invalid border-red-500 @enderror bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-blue-950 block w-full p-2.5">
+                                        <option selected disabled>Pilih Vendor</option>
+                                        @foreach ($vendor as $item)
+                                            <option value="{{ $item->vendor_id }}"
+                                                {{ $data->vendor_id == $item->vendor_id ? 'selected' : '' }}>
+                                                {{ $item->fullname }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('vendor_id')
+                                        <div class="text-xs text-red-600 mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                {{-- select list status --}}
                                 <div class="mb-5">
                                     <label for="status"
                                         class="block mb-2 text-sm font-medium text-gray-900">Status</label>
                                     <select id="status" name="status"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                                        class="@error('status') is-invalid border-red-500 @enderror bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-blue-950 block w-full p-2.5">
                                         <option selected disabled>Pilih Status</option>
-                                        <option value="draft">Draft</option>
-                                        <option value="aktif">Aktif</option>
+                                        <option value="draft" {{ $data->status == 'draft' ? 'selected' : '' }}>
+                                            Draft</option>
+                                        <option value="aktif" {{ $data->status == 'aktif' ? 'selected' : '' }}>
+                                            Aktif</option>
                                     </select>
+                                    @error('status')
+                                        <div class="text-xs text-red-600 mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -201,13 +218,9 @@
         });
         let img = document.getElementById('dropzone-img')
         let dropZoneInput = document.getElementById('dropzone-file')
-        const dropZoneLabel = document.getElementById('dropzone-label')
-        const dropZoneImg = document.getElementById('dropzone-img')
         dropZoneInput.onchange = (e) => {
             if (dropZoneInput.files[0])
                 img.src = URL.createObjectURL(dropZoneInput.files[0])
-            dropZoneLabel.classList.add("hidden")
-            dropZoneImg.classList.add("h-32")
         }
 
         function numberWithDotes(x) {

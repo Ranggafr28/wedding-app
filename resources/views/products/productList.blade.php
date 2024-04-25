@@ -22,20 +22,6 @@
                         @livewire('cart-counter')
                         <button type="button" class="block p-0 text-sm text-white transition-all ease-nav-brand">
                         </button>
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -103,7 +89,7 @@
             <div class="w-full max-w-full px-3 mt-0 lg:w-full lg:flex-none">
                 <div
                     class="border-black/12.5 shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-xl border-0 border-solid bg-white bg-clip-border p-5">
-                    {{-- dropdown --}}
+                    {{-- dropdown trigger filter --}}
                     <div id="accordion-collapse" data-accordion="collapse" class="mb-5">
                         <h2 id="accordion-collapse-heading-1">
                             <button type="button"
@@ -119,6 +105,7 @@
                                 </svg>
                             </button>
                         </h2>
+                        {{-- filter --}}
                         <div id="accordion-collapse-body-1" class="hidden" aria-labelledby="accordion-collapse-heading-1">
                             <div class="p-5 border border-gray-200 rounded-lg mt-3">
                                 <form action="{{ route('productList') }}" method="GET">

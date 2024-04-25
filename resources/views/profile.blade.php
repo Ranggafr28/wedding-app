@@ -23,20 +23,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -137,22 +123,26 @@
             </div>
         </div>
     </div>
-    @if (session()->has('updateProfile'))
+    @if (session()->has('success'))
         <script>
             Swal.fire({
-                icon: 'success',
-                title: 'success',
-                text: 'Profile updated successfully',
-            })
+                position: "center",
+                icon: "success",
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 2000
+            });
         </script>
     @endif
-    @if (session()->has('updatePassword'))
+    @if (session()->has('error'))
         <script>
             Swal.fire({
-                icon: 'success',
-                title: 'success',
-                text: 'Password updated successfully',
-            })
+                position: "center",
+                icon: "error",
+                text: "{{ session('error') }}",
+                showConfirmButton: false,
+                timer: 2000
+            });
         </script>
     @endif
     <div class="w-full p-6 mx-auto">
@@ -180,7 +170,7 @@
                                         Lengkap</label>
                                     <input type="text" name="fullname" value='{{ $user->fullname }}'
                                         placeholder="Masukan nama lengkap..."
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:ring-0 focus:border-blue-50 focus:outline-none" />
                                 </div>
                             </div>
                             <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
@@ -189,7 +179,7 @@
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Nomor HP</label>
                                     <input type="number" name="phone" value='{{ '0' . $user->phone }}'
                                         placeholder="Masukan nomor hp..."
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:ring-0 focus:border-blue-50 focus:outline-none" />
                                 </div>
                             </div>
                             <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
@@ -198,29 +188,9 @@
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Email</label>
                                     <input type="email" name="email" value='{{ $user->email }}'
                                         placeholder="Masukan email..."
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:ring-0 focus:border-blue-50 focus:outline-none" />
                                 </div>
                             </div>
-                            @if (auth()->user()->role == 'vendor')
-                                <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                                    <div class="mb-4">
-                                        <label for="category"
-                                            class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Kategori
-                                            vendor</label>
-                                        <select id="category" name="category" required
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                            <option selected disabled>Pilih Kategori</option>
-                                            @foreach ($category as $item)
-                                                <option class="capitalize"
-                                                    {{ $item->category == $user->category ? 'selected' : '' }}
-                                                    value="{{ $item->category }}">
-                                                    {{ $item->category }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
                         <hr
                             class="h-px mx-0 my-4 bg-transparent border-0 opacity-25 bg-gradient-to-r from-transparent via-black/40 to-transparent" />
@@ -233,7 +203,7 @@
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Alamat</label>
                                     <input type="text" name="address" value='{{ $user->address }}'
                                         placeholder="Masukan alamat user..."
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:ring-0 focus:border-blue-50 focus:outline-none" />
                                 </div>
                             </div>
                             <div class="w-full max-w-full px-3 shrink-0 md:w-1/2 md:flex-0">
@@ -242,7 +212,7 @@
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Kota</label>
                                     <input type="text" name="city" value='{{ $user->city }}'
                                         placeholder="Masukan nama kota..."
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:ring-0 focus:border-blue-50 focus:outline-none" />
                                 </div>
                             </div>
                             <div class="w-full max-w-full px-3 shrink-0 md:w-1/2 md:flex-0">
@@ -251,7 +221,7 @@
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Negara</label>
                                     <input type="text" name="country" value="{{ $user->country }}"
                                         placeholder="Masukan nama negara..." readonly
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:ring-0 focus:border-blue-50 focus:outline-none" />
                                 </div>
                             </div>
                         </div>
@@ -271,14 +241,28 @@
                         </div>
                         <div class="flex flex-wrap -mx-3">
                             <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                                <div class="mb-4">
-                                    <label for="password"
-                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700">Password
-                                        Baru</label>
-                                    <input type="password" name="password" placeholder="Masukan password baru"
-                                        class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
-                                    <small>Kosongkan jika tidak ingin mengubah password</small>
+                                <div class="relative">
+                                    <label for="username"
+                                        class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+                                    <div class="flex items-center">
+                                        <input type="password" id="passwordField" name="password"
+                                            class="focus text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-950 focus:ring-0 pe-10"
+                                            placeholder="password">
+                                        <button type="button" onclick="showPassword()" id="showPasswordButton"
+                                            class="cursor-pointer absolute inset-y-0 right-0 top-6 flex items-center pe-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                fill="currentColor" class="w-5 h-5">
+                                                <path
+                                                    d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
+                                                <path
+                                                    d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
+                                                <path
+                                                    d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
+                                <small class="my-2">Kosongkan jika tidak ingin mengubah password</small>
                             </div>
                         </div>
                     </form>
@@ -329,6 +313,7 @@
 
         </div>
     </div>
+    <script src="{{ asset('assets/js/showPassword.js') }}" async></script>
     <script>
         function toggle(section) {
             const changePassword = document.getElementById('changePassword')

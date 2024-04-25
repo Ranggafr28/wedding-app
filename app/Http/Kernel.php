@@ -37,6 +37,9 @@ class Kernel extends HttpKernel
 
         // Middleware untuk customer
         'customer' => \App\Http\Middleware\CheckCustomerRole::class,
+
+        // Middleware untuk admin dan vendor
+        'operator' => \App\Http\Middleware\CheckOperatorRole::class,
     ];
 
     protected $middlewareGroups = [

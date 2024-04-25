@@ -108,7 +108,7 @@ class roleController extends Controller
         $validatedData['updated_at'] = Carbon::now();
         RoleModels::where('id', $id)
             ->update($validatedData);
-        return redirect()->route('role.index')->with('update', 'Berhasil mengubah 1 data role');
+        return redirect()->route('role.index')->with('success', 'Berhasil mengubah 1 data role');
         return back()->with('error', 'Maaf!, Inputan tidak boleh kosong')->withInput(old('role'));
     }
 
@@ -119,6 +119,6 @@ class roleController extends Controller
     {
         $data = RoleModels::find($id);
         $data->delete();
-        return redirect()->route('role.index')->with('delete', 'Berhasil menghapus 1 data role');
+        return redirect()->route('role.index')->with('success', 'Berhasil menghapus 1 data role');
     }
 }

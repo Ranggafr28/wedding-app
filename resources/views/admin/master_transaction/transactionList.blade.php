@@ -24,20 +24,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -105,22 +91,74 @@
             <div class="w-full max-w-full px-3 mt-0 lg:w-full lg:flex-none">
                 <div
                     class="border-black/12.5 shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-xl border-0 border-solid bg-white bg-clip-border p-5">
-                    {{-- filter view --}}
-                    <div class="flex justify-between w-full items-center ">
-                        <form class="w-1/3" action="{{ route($route) }}" method="GET">
-                            <div class="relative">
-                                <input type="text" name="search" id="default-search" value=""
-                                    class="block w-full py-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950"
-                                    placeholder="Cari nama user, username ..." />
-                                <button type="submit"
-                                    class="absolute end-2.5 bottom-2 font-medium rounded-lg text-sm px-4 py-2"><svg
-                                        class="w-4 h-4 text-gray-700" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg></button>
+                    {{-- filter --}}
+                    <div id="accordion-collapse" data-accordion="collapse" class="mb-5">
+                        {{-- call to action --}}
+                        <div class="flex justify-between">
+                            {{-- trigger accordination --}}
+                            <h2 id="accordion-collapse-heading-1">
+                                <button type="button"
+                                    class="flex items-center justify-between w-auto  py-2 px-3 font-medium  text-gray-600 border border-gray-300 rounded-lg focus:ring-0 gap-3"
+                                    data-accordion-target="#accordion-collapse-body-1"
+                                    aria-expanded="{{ !empty($search) || !empty($status) ? 'true' : 'false' }}"
+                                    aria-controls="accordion-collapse-body-1">
+                                    <span>Filter</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-filter">
+                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                    </svg>
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="accordion-collapse-body-1" class="hidden"
+                            aria-labelledby="accordion-collapse-heading-1">
+                            <div class="p-5 border border-gray-200 rounded-lg mt-3">
+                                {{-- filter view --}}
+                                <form action="{{ route($route) }}" method="GET">
+                                    <div class="grid grid-cols-4 gap-4 mb-5">
+                                        <div class="relative col-span-2">
+                                            <input type="text" name="search" id="default-search"
+                                                value="{{ $search }}"
+                                                class="block w-full py-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950"
+                                                placeholder="Cari no trans, customer ..." />
+                                            <button type="submit"
+                                                class="absolute end-2.5 bottom-2 font-medium rounded-lg text-sm px-4 py-2"><svg
+                                                    class="w-4 h-4 text-gray-700" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 20 20">
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2"
+                                                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                                </svg></button>
+                                        </div>
+                                        <select name="status"
+                                            class="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950">
+                                            <option selected value="">Semua status</option>
+                                            <option value="Menunggu Pembayaran"
+                                                {{ $status == 'Menunggu Pembayaran' ? 'selected' : '' }}>Menunggu
+                                                Pembayaran
+                                            </option>
+                                            <option value="Pesanan Diproses"
+                                                {{ $status == 'Pesanan Diproses' ? 'selected' : '' }}>Pesanan
+                                                Diproses</option>
+                                            <option value="Pesanan Dibatalkan"
+                                                {{ $status == 'Pesanan Dibatalkan' ? 'selected' : '' }}>Pesanan
+                                                Dibatalkan
+                                            </option>
+                                            <option value="Pesanan Selesai"
+                                                {{ $status == 'Pesanan Selesai' ? 'selected' : '' }}>
+                                                Pesanan Selesai</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit"
+                                            class="bg-blue-950 py-2 px-3 text-sm rounded-lg text-white font-medium">Terapkan
+                                            filter</button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     @if (session()->has('success'))
                         <script>
@@ -209,17 +247,27 @@
                                         </td>
                                         <td class="px-6 py-4 text-center w-32">
                                             <div class="grid grid-cols-2 gap-5">
-                                                <button data-modal-target="default-modal"
-                                                    data-modal-toggle="default-modal"
-                                                    class="bg-yellow-600 text-white p-2 rounded-lg w-fit"><svg
-                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                        fill="currentColor" class="w-5 h-5">
-                                                        <path
-                                                            d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
-                                                        <path
-                                                            d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
-                                                    </svg>
-                                                </button>
+                                                @if (auth()->user()->role == 'administrator' &&
+                                                        now()->format('Y-m-d') > $item->event_date &&
+                                                        $item->event_date &&
+                                                        $item->status != 'Pesanan Selesai')
+                                                    <button onclick="updateStatus('{{ $item->no_trans }}')"
+                                                        class="bg-green-600 text-white p-2 rounded-lg w-fit"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round" class="lucide lucide-check-check">
+                                                            <path d="M18 6 7 17l-5-5" />
+                                                            <path d="m22 10-7.5 7.5L13 16" />
+                                                        </svg>
+                                                    </button>
+                                                    <form id="update-form-{{ $item->no_trans }}"
+                                                        action="{{ route('statusUpdate') }}" method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="no_trans"
+                                                            value="{{ $item->no_trans }}">
+                                                    </form>
+                                                @endif
                                                 <a href="{{ route('transactionDetail', ['no_trans' => $item->no_trans]) }}"
                                                     class="bg-cyan-600 text-white p-2 rounded-lg w-fit"><svg
                                                         xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
@@ -247,57 +295,6 @@
                                 @endif
                             </tbody>
                         </table>
-                        <div id="default-modal" tabindex="-1" aria-hidden="true"
-                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-96 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                        <div class="relative p-4 w-full max-w-2xl max-h-full">
-                            <!-- Modal content -->
-                            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                                <!-- Modal header -->
-                                <div
-                                    class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                        Terms of Service
-                                    </h3>
-                                    <button type="button"
-                                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                        data-modal-hide="default-modal">
-                                        <svg class="w-3 h-3" aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 14 14">
-                                            <path stroke="currentColor" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"
-                                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                        </svg>
-                                        <span class="sr-only">Close modal</span>
-                                    </button>
-                                </div>
-                                <!-- Modal body -->
-                                <div class="p-4 md:p-5 space-y-4">
-                                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                        With less than a month to go before the European Union enacts new
-                                        consumer privacy laws for its citizens, companies around the world
-                                        are updating their terms of service agreements to comply.
-                                    </p>
-                                    <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                        The European Union’s General Data Protection Regulation (G.D.P.R.)
-                                        goes into effect on May 25 and is meant to ensure a common set of
-                                        data rights in the European Union. It requires organizations to
-                                        notify users as soon as possible of high-risk data breaches that
-                                        could personally affect them.
-                                    </p>
-                                </div>
-                                <!-- Modal footer -->
-                                <div
-                                    class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                                    <button data-modal-hide="default-modal" type="button"
-                                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I
-                                        accept</button>
-                                    <button data-modal-hide="default-modal" type="button"
-                                        class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Decline</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     </div>
                     <div class=" my-5 px-5">
                         {{ $data->links() }}
@@ -306,19 +303,20 @@
             </div>
         </div>
     </div>
+
     <script>
-        function deleteData(id) {
+        function updateStatus(id) {
             Swal.fire({
                 title: 'Apa Kamu Yakin?',
-                text: "Kamu Tidak Dapat Mengembalikan Data ini!",
+                text: "Ingin menyelesaikan transaksi ini?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, hapus ini!'
+                confirmButtonText: 'Ya, saya yakin!'
             }).then((result) => {
                 if (result.value) {
-                    document.getElementById(`delete-form-${id}`).submit();
+                    document.getElementById(`update-form-${id}`).submit();
                 }
             });
         }

@@ -36,6 +36,7 @@ class CartProductList extends Component
         'code_product' => $product['codeProduct'],
         'qty' => $product['productQty'],
         'price' => $product['productPrice'],
+        'remark' => $product['productNote'],
       ]);
     }
     // simpan data transaksi
@@ -86,7 +87,7 @@ class CartProductList extends Component
           'phone' => '0' . $user->phone,
         ],
       ];
-// data list produk yang dibeli untuk dikirim ke midtransF 
+      // data list produk yang dibeli untuk dikirim ke midtransF 
       foreach ($data as $product) {
         $params['item_details'][] = [
           'id' => $product['codeProduct'],

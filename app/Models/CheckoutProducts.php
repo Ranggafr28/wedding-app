@@ -15,7 +15,7 @@ class CheckoutProducts extends Model
         'code_product',
         'qty',
         'price',
-        'remark',
+        'product_note',
         'created_at',
         'updated_at',
     ];

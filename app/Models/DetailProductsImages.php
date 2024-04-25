@@ -11,6 +11,7 @@ class DetailProductsImages extends Model
 
     protected $fillable = [
         'code_product',
+        'vendor_id',
         'images',
         'status',
         'created_by',

@@ -56,20 +56,6 @@
                             <button type="button" class="block p-0 me-1 text-sm text-white transition-all ease-nav-brand">
                             </button>
                         @endif
-                        {{-- button notifikasi --}}
-                        <button type="button" class="relative p-3 me-5 text-sm font-medium text-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-bell-ring">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
-                                <path d="M22 8c0-2.3-.8-4.3-2-6" />
-                            </svg>
-                            <div
-                                class="absolute inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-red-500 border border-white rounded-full -top-1 -end-1">
-                                20</div>
-                        </button>
                     </div>
                     <li class="flex items-center">
                         <button data-popover-target="popover-bottom" data-popover-placement="bottom" type="button"
@@ -137,22 +123,60 @@
             <div class="w-full max-w-full px-3 mt-0 lg:w-full lg:flex-none">
                 <div
                     class="border-black/12.5 shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-xl border-0 border-solid bg-white bg-clip-border p-5">
-                    {{-- filter view --}}
-                    <div class="flex justify-between w-full items-center ">
-                        <form class="w-1/3" action="{{ route($route) }}" method="GET">
-                            <div class="relative">
-                                <input type="text" name="search" id="default-search" value=""
-                                    class="block w-full py-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950"
-                                    placeholder="Cari nama user, username ..." />
-                                <button type="submit"
-                                    class="absolute end-2.5 bottom-2 font-medium rounded-lg text-sm px-4 py-2"><svg
-                                        class="w-4 h-4 text-gray-700" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg></button>
+                    {{-- filter --}}
+                    <div id="accordion-collapse" data-accordion="collapse" class="mb-5">
+                        {{-- call to action --}}
+                        <div class="flex justify-between">
+                            {{-- trigger accordination --}}
+                            <h2 id="accordion-collapse-heading-1">
+                                <button type="button"
+                                    class="flex items-center justify-between w-auto  py-2 px-3 font-medium  text-gray-600 border border-gray-300 rounded-lg focus:ring-0 gap-3"
+                                    data-accordion-target="#accordion-collapse-body-1"
+                                    aria-expanded="{{ !empty($search) || !empty($filterTgl) ? 'true' : 'false' }}"
+                                    aria-controls="accordion-collapse-body-1">
+                                    <span>Filter</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-filter">
+                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                                    </svg>
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="accordion-collapse-body-1" class="hidden"
+                            aria-labelledby="accordion-collapse-heading-1">
+                            <div class="p-5 border border-gray-200 rounded-lg mt-3">
+                                {{-- filter view --}}
+                                <form action="{{ route($route) }}" method="GET">
+                                    <div class="grid grid-cols-4 gap-4 mb-5">
+                                        <div class="relative">
+                                            <input type="text" name="search" id="default-search"
+                                                value="{{ $search }}"
+                                                class="block w-full py-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950"
+                                                placeholder="Cari no trans, customer ..." />
+                                            <button type="submit"
+                                                class="absolute end-2.5 bottom-2 font-medium rounded-lg text-sm px-4 py-2"><svg
+                                                    class="w-4 h-4 text-gray-700" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 20 20">
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2"
+                                                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                                </svg></button>
+                                        </div>
+                                        <input type="text" name="filterTgl" id="filterTgl"
+                                            value="{{ $filterTgl }}"
+                                            class="block w-full py-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-0 focus:border-blue-950"
+                                            placeholder="Masukan filter tanggal ..." />
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit"
+                                            class="bg-blue-950 py-2 px-3 text-sm rounded-lg text-white font-medium">Terapkan
+                                            filter</button>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     @if (session()->has('success'))
                         <script>
@@ -300,6 +324,17 @@
         </div>
     </div>
     <script>
+        // config flatpickr untuk filter tanggal
+        $(document).ready(() => {
+            $("#filterTgl").flatpickr({
+                altInput: true,
+                altFormat: "j F, Y",
+                dateFormat: "Y-m-d",
+                locale: 'id',
+                mode: 'range'
+            });
+        })
+
         function approvalTrans(no_trans, approval) {
             document.getElementById('approval').value = approval
             document.getElementById('no_trans').value = no_trans

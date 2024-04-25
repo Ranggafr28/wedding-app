@@ -31,8 +31,11 @@ class DetailProducts extends Controller
                 })
                 ->when($status, function ($query, $status) {
                     return $query->where('detail_product_images.status', '=', $status);
-                })
-                ->orderBy('detail_product_images.created_at', 'desc')
+                });
+            if (auth()->user()->role == 'vendor') {
+                $data = $data->where('detail_product_images.vendor_id', '=', auth()->user()->user_id);
+            }
+            $data = $data->orderBy('detail_product_images.created_at', 'desc')
                 ->paginate(10);
         } else {
             $data = DetailProductsImages::select(
@@ -40,8 +43,11 @@ class DetailProducts extends Controller
                 'master_product.product as product_name',
                 'detail_product_images.id as brosur_id',
             )
-                ->leftJoin('master_product', 'detail_product_images.code_product', '=', 'master_product.code_product')
-                ->orderBy('detail_product_images.created_at', 'desc')
+                ->leftJoin('master_product', 'detail_product_images.code_product', '=', 'master_product.code_product');
+            if (auth()->user()->role == 'vendor') {
+                $data = $data->where('detail_product_images.vendor_id', '=', auth()->user()->user_id);
+            }
+            $data = $data->orderBy('detail_product_images.created_at', 'desc')
                 ->paginate(10);
         }
         $user = CustomerModels::where('user_id', auth()->user()->user_id)->first();
@@ -49,7 +55,7 @@ class DetailProducts extends Controller
             $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
         }
         $category = CategoryModels::all();
-        return view('detail_products.index', [
+        return view('products_brosur.index', [
             'title' => 'Brosur Produk',
             'modul' => 'Detail Products',
             'route' => 'gallery-list',
@@ -70,15 +76,19 @@ class DetailProducts extends Controller
         if (!$user) {
             $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
         }
-        $product = ProductModels::all();
+        // jika role user vendor maka ambil data produk vendor ini saja, jika bukan ambil semua data produk
+        $product = auth()->user()->role == 'vendor' ? ProductModels::where('vendor_id', auth()->user()->user_id)->get() : ProductModels::all();
+        // jika role user vendor maka ambil data vendor user ini saja, jika bukan ambil semua data vendor
+        $vendor = auth()->user()->role == 'vendor' ? VendorModels::where('vendor_id', auth()->user()->user_id)->get() : VendorModels::all();
         $category = CategoryModels::all();
-        return view('detail_products.create', [
+        return view('products_brosur.create', [
             'title' => 'Tambah Data',
             'modul' => 'Detail Products',
             'route' => 'gallery-list',
             'product' => $product,
             'category' => $category,
-            'user' => $user
+            'user' => $user,
+            'vendor' => $vendor,
         ]);
     }
 
@@ -90,6 +100,7 @@ class DetailProducts extends Controller
         $validatedData = $request->validate([
             'code_product' => 'required',
             'status' => 'required',
+            'vendor_id' => 'required',
             'images' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -128,15 +139,19 @@ class DetailProducts extends Controller
         if (!$user) {
             $user = VendorModels::where('vendor_id', auth()->user()->user_id)->first();
         }
-        $product = ProductModels::all();
+        // jika role user vendor maka ambil data produk vendor ini saja, jika bukan ambil semua data produk
+        $product = auth()->user()->role == 'vendor' ? ProductModels::where('vendor_id', auth()->user()->user_id)->get() : ProductModels::all();
+        // jika role user vendor maka ambil data vendor user ini saja, jika bukan ambil semua data vendor
+        $vendor = auth()->user()->role == 'vendor' ? VendorModels::where('vendor_id', auth()->user()->user_id)->get() : VendorModels::all();
         $data = DetailProductsImages::find($id);
-        return view('detail_products.update', [
+        return view('products_brosur.update', [
             'title' => 'Ubah Data',
             'modul' => 'Detail Products',
             'route' => 'gallery-list',
             'data' => $data,
             'product' => $product,
-            'user' => $user
+            'user' => $user,
+            'vendor' => $vendor,
         ]);
     }
 
@@ -148,6 +163,7 @@ class DetailProducts extends Controller
         $validatedData = $request->validate([
             'code_product' => 'required',
             'status' => 'required',
+            'vendor_id' => 'required',
             'images' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 

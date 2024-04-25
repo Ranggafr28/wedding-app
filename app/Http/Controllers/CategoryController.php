@@ -119,7 +119,7 @@ class CategoryController extends Controller
     $result = CategoryModels::where('id', $id)
       ->update($validatedData);
     if ($result) {
-      return redirect()->route('category.index')->with('update', 'Berhasil mengubah 1 data kategori');
+      return redirect()->route('category.index')->with('success', 'Berhasil mengubah 1 data kategori');
     }
 
     return back()->with('error', 'Maaf!, Inputan tidak boleh kosong')->withInput($request->all());
@@ -132,6 +132,6 @@ class CategoryController extends Controller
   {
     $data = CategoryModels::find($id);
     $data->delete();
-    return redirect()->route('category.index')->with('delete', 'Berhasil menghapus 1 data kategori');
+    return redirect()->route('category.index')->with('success', 'Berhasil menghapus 1 data kategori');
   }
 }
